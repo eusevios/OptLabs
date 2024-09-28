@@ -33,6 +33,5 @@ public class Fibonacci {
             this.fn = fn;
             this.fn1 = fn1;
         }
-        ё
     }
 }
