@@ -1,13 +1,16 @@
-package ExtremumAlgorithms;
+package LAB1;
 
-public class Fibonacci {
-    public static double getMinimum(IFunction1D func, double lhs, double rhs, double eps) {
+import MathUtils.IFunction1D;
+
+public class GoldenRatio {
+    public static double getMinimum(IFunction1D func, double lhs, double rhs, double eps, int maxIters) {
         final double PHI = 2/(1+Math.sqrt(5));
         double xr = lhs + (rhs-lhs) * PHI;
         double xl = rhs - (rhs-lhs) * PHI;
         double fr = func.apply(xr);
         double fl = func.apply(xl);
-        for(int iter = 0; (rhs-lhs)>=2*eps; iter++){
+        int iter = 0;
+        for(; (rhs-lhs)>=2*eps; iter++){
             if(fl>fr){
                 lhs = xl;
                 xl = xr;
@@ -23,15 +26,7 @@ public class Fibonacci {
                 fl = func.apply(xl);
             }
         }
-        return (rhs+lhs)/2;
-    }
 
-    class FibonacciNumbers{
-        private double fn;
-        private double fn1;
-        FibonacciNumbers(double fn, double fn1){
-            this.fn = fn;
-            this.fn1 = fn1;
-        }
+        return (rhs+lhs)/2;
     }
 }

@@ -1,4 +1,4 @@
-package ExtremumAlgorithms;
+package MathUtils;
 
 @FunctionalInterface
 public interface IFunction1D {
