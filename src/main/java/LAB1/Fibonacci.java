@@ -9,8 +9,7 @@ public class Fibonacci {
         double xr = lhs + fibonacciNumbers.getFn() / fibonacciNumbers.getFn1() * (rhs - lhs);
         double fr = func.apply(xr);
         double fl = func.apply(xl);
-        int iter = 0;
-        for (;(rhs - lhs) > 2 * eps; iter++) {
+        while ((rhs - lhs) > 2 * eps) {
             if(fl>fr){
                 lhs = xl;
                 xl = xr;
