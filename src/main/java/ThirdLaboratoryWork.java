@@ -1,3 +1,4 @@
+import mathUtils.TemplateVector;
 import mathUtils.functionalInterfaces.IFunctionND;
 import mathUtils.NumericCommon;
 import mathUtils.DoubleVector;
@@ -5,38 +6,58 @@ import mathUtils.DoubleMatrix;
 import java.util.Objects;
 public class ThirdLaboratoryWork {
     public static DoubleVector gradientDescend(IFunctionND function, DoubleVector xStart, double eps, int maxIterations) {
-        DoubleVector x_i = new DoubleVector(xStart);
-        DoubleVector x_i_1 = new DoubleVector(xStart);
-        int cntr = 0;
-        for (; cntr != maxIterations; cntr++) {
-            x_i_1 = DoubleVector.sub(x_i, DoubleVector.gradient(function, x_i, eps));
-            x_i_1 = SecondLaboratoryWork.biSect(function, x_i, x_i_1, eps, maxIterations);
-            if (DoubleVector.distance(x_i_1, x_i) < 2 * eps) break;
-            x_i = x_i_1;
+        DoubleVector x0;
+        DoubleVector x1 = new DoubleVector(xStart);
+        int iter = 0;
+        do{
+            iter++;
+            x0 = x1;
+            x1 = DoubleVector.sub(x0, DoubleVector.gradient(function, x0, eps));
+            x1 = SecondLaboratoryWork.fibonacci(function, x0, x1, eps);
         }
+        while (DoubleVector.distance(x0, x1) > 2 * eps && iter < maxIterations);
+        System.out.println("iters" + iter);
+        System.out.println("eps: " + DoubleVector.distance(x0, x1));
+        return x1;
 
-        if (NumericCommon.SHOW_DEBUG_LOG) System.out.printf("gradient descend iterations number : %s\n", cntr + 1);
-
-        return DoubleVector.add(x_i_1, x_i).mul(0.5);
     }
     public static DoubleVector conjGradientDescend(IFunctionND function, DoubleVector xStart, double eps, int maxIterations) {
-        DoubleVector x_i = new DoubleVector(xStart);
-        DoubleVector x_i_1 = new DoubleVector(xStart);
-        DoubleVector s_i = DoubleVector.gradient(function, xStart, eps).mul(-1.0), s_i_1;
-        double omega;
-        int iteration = 0;
-        for (; iteration != maxIterations; iteration++) {
-            x_i_1 = DoubleVector.add(x_i, s_i);
-            x_i_1 = SecondLaboratoryWork.biSect(function, x_i, x_i_1, eps, maxIterations);
-            if (DoubleVector.distance(x_i_1, x_i) < 2 * eps) break;
-            s_i_1 = DoubleVector.gradient(function, x_i_1, eps);
-            omega = Math.pow((s_i_1).magnitude(), 2) / Math.pow((s_i).magnitude(), 2);
-            s_i.mul(omega).sub(s_i_1);
-            x_i = x_i_1;
+        DoubleVector x0 = new DoubleVector(xStart);
+        DoubleVector s0 = DoubleVector.gradient(function, xStart, eps).mul(-1.0);
+        DoubleVector x1, s1;
+        int iter = 0;
+        do{
+            x1 = DoubleVector.add(x0, s0);
+            x1 = SecondLaboratoryWork.fibonacci(function, x0, x1, eps);
+            iter++;
+            if (DoubleVector.distance(x1, x0) > 2 * eps) {
+                s1 = DoubleVector.gradient(function, x1, eps);
+                s0.mul(Math.pow(s1.magnitude() / s0.magnitude(), 2)).sub(s1);
+                x0 = x1;
+            }
+            else break;
         }
-
-        if (NumericCommon.SHOW_DEBUG_LOG)
-            System.out.printf("Conj gradient descend iterations number : %s\n", iteration + 1);
-        return DoubleVector.add(x_i_1, x_i).mul(0.5);
+        while (iter < maxIterations);
+        System.out.println("iters: " + iter);
+        System.out.println("eps: "  + DoubleVector.distance(x0, x1));
+        return x1;
+    }
+    public static DoubleVector newtoneRaphson(IFunctionND function, DoubleVector xStart, double eps, int maxIterations) {
+        DoubleVector x0 = new DoubleVector(xStart);
+        DoubleVector x1, grad;
+        DoubleMatrix invHessian;
+        int iter = 0;
+        do{
+            iter++;
+            invHessian = DoubleMatrix.invert(DoubleMatrix.hessian(function, x0));
+            grad = DoubleVector.gradient(function, x0, eps);
+            x1 = DoubleVector.sub(x0, DoubleMatrix.mul(invHessian, grad));
+            if (DoubleVector.distance(x1, x0) > 2 * eps) x0 = x1;
+            else break;
+        }
+        while (iter < maxIterations);
+        System.out.println("iters: " + iter);
+        System.out.println("eps: "  + DoubleVector.distance(x0, x1));
+        return x1;
     }
 }
